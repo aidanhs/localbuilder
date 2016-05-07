@@ -29,3 +29,9 @@ RUN git clone https://github.com/tmux/tmux.git && \
 	./configure --enable-static --prefix=/home/aidanhs/local && \
 	make && \
 	make install
+
+RUN git clone https://github.com/StackExchange/blackbox.git && \
+    cd blackbox && \
+    git checkout v1.20160122 && \
+    cp -r bin/* /home/aidanhs/local/bin/ && \
+    rm /home/aidanhs/local/bin/Makefile
