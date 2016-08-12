@@ -1,0 +1,14 @@
+http://www.mono-project.com/docs/compiling-mono/small-footprint/
+http://www.mono-project.com/docs/compiling-mono/linux/
+
+http://blog.empalis-systems.com/struggling-with-mkbundle/
+http://www.mono-project.com/docs/advanced/pinvoke/
+http://askubuntu.com/questions/127796/keepass2-plugins-directory
+http://keepass.info/help/v2/plugins.html
+https://hub.docker.com/_/mono/
+https://github.com/mefellows/docker-mono-static
+http://www.mono-project.com/docs/compiling-mono/compiling-from-git/
+http://www.mono-project.com/docs/compiling-mono/unsupported-advanced-compile-options/
+
+
+mkbundle --config /etc/mono/config --static --deps -o kp KeePass.exe *.dll
