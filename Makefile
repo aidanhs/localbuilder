@@ -1,12 +1,17 @@
 .PHONY: build localbuilder install
 
+default: build
+
 GRAB = docker run --rm localbuilder cat
 
 build: local.tar.gz
 
-install: build
+install: local.tar.gz
 	rm -rf $$HOME/local
-	cd $$HOME && tar xf $$(cd -)/local.tar.gz
+	cd $$HOME && tar xf $$(cd -)/$<
+
+deploy: local.tar.gz
+	scp $< aidanhs.com:/var/www/aidanhs/$<
 
 localbuilder:
 	tar -c -f - Dockerfile *.patch *.tar.gz | docker build --tag localbuilder -
