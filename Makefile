@@ -14,7 +14,7 @@ deploy: local.tar.gz
 	scp $< aidanhs.com:/var/www/aidanhs/$<
 
 localbuilder:
-	tar -c -f - Dockerfile *.patch *.tar.gz | docker build --tag localbuilder -
+	tar -c -f - Dockerfile *.tar.gz | docker build --tag localbuilder -
 
 local.tar.gz: localbuilder
 	$(GRAB) /work/local.tar.gz > $@
