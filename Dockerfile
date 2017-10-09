@@ -33,7 +33,7 @@ RUN git clone https://github.com/tmux/tmux.git && \
 
 RUN git clone https://github.com/StackExchange/blackbox.git && \
     cd blackbox && \
-    git checkout v1.20160122 && \
+    git checkout v1.20170611 && \
     cp -r bin/* /home/aidanhs/local/bin/ && \
     rm /home/aidanhs/local/bin/Makefile
 
