@@ -46,5 +46,23 @@ RUN wget -q https://github.com/keepassxreboot/keepassxc/releases/download/2.2.1/
     chmod +x KeePassXC-2.2.1-x86_64.AppImage && \
     mv KeePassXC-2.2.1-x86_64.AppImage /home/aidanhs/local/bin/keepassxc
 
+RUN mkdir -p /home/aidanhs/local/opt && \
+    cd /home/aidanhs/local/opt && \
+    wget -q -O - "https://www.dropbox.com/download?plat=lnx.x86_64" | tar xzf - && \
+    wget -q -O dropbox.py 'https://www.dropbox.com/download?dl=packages/dropbox.py' && \
+    chmod +x /home/aidanhs/local/opt/dropbox.py && \
+    /bin/echo -e '#!/bin/bash\nset -o errexit\nset -o nounset\nset -o pipefail\nset -o xtrace' >> /home/aidanhs/local/bin/dropbox && \
+    /bin/echo -e 'test -L ~/.dropbox-dist || ln -s local/opt/.dropbox-dist ~/.dropbox-dist' >> /home/aidanhs/local/bin/dropbox && \
+    /bin/echo -e 'exec /home/aidanhs/local/opt/dropbox.py "$@"' >> /home/aidanhs/local/bin/dropbox && \
+    chmod +x /home/aidanhs/local/bin/dropbox
+
+RUN /bin/echo -e '#!/bin/bash\nset -o errexit\nset -o nounset\nset -o pipefail\nset -o xtrace' >> /home/aidanhs/local/bin/pass && \
+    /bin/echo -e 'keepassxc ~/Dropbox/pass/keepass.kdbx' >> /home/aidanhs/local/bin/pass && \
+    chmod +x /home/aidanhs/local/bin/pass
+
+RUN /bin/echo -e '#!/bin/bash\nset -o errexit\nset -o nounset\nset -o pipefail\nset -o xtrace' >> /home/aidanhs/local/bin/updbox && \
+    /bin/echo -e 'cd\nwget https://aidanhs.com/local.tar.gz\nrm -rf local\ntar xf local.tar.gz\nrm local.tar.gz' >> /home/aidanhs/local/bin/updbox && \
+    chmod +x /home/aidanhs/local/bin/updbox
+
 RUN tar -c -f /work/local.tar -C /home/aidanhs local && \
     gzip /work/local.tar
