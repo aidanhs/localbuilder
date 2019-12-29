@@ -38,7 +38,8 @@ elif [ "$1" = _postupdate ]; then
     echo
     echo "> INSTALL/REPLACE"
 
-    echo "Setting up syncthing"
+    echo "Setting up syncthing for desktop machines"
+    mkdir -p ~/.config/autostart
     cp ~/local/etc/syncthing-start.desktop ~/.config/autostart/
     echo "If this is the first time setting up syncthing, log out and in, and run 'syncthing -browser-only'"
 
