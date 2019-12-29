@@ -2,7 +2,7 @@
 
 default: build
 
-GRAB = docker run --rm localbuilder cat
+GRAB = podman run --rm localbuilder cat
 
 build: local.tar.gz
 
@@ -11,10 +11,10 @@ install: local.tar.gz
 	cd $$HOME && tar xf $$(cd -)/$<
 
 deploy: local.tar.gz
-	scp $< aidanhs.com:/var/www/aidanhs/$<
+	rsync -av --progress $< aidanhs.com:/var/www/aidanhs/$<
 
 localbuilder:
-	tar -c -f - Dockerfile *.tar.gz | docker build --tag localbuilder -
+	tar -c -f - Dockerfile *.tar.gz scripts | podman build --tag localbuilder -
 
 local.tar.gz: localbuilder
-	$(GRAB) /work/local.tar.gz > $@
+	$(GRAB) /work/local.tar | gzip --rsyncable -c > $@

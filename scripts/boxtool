@@ -1,0 +1,43 @@
+#!/bin/bash
+set -o errexit
+set -o nounset
+set -o pipefail
+
+help() {
+    echo "Invalid command: choose one of 'upd'"
+}
+
+if [ "$#" -lt 1 ]; then
+    help
+    exit 1
+fi
+
+if [ "$1" = upd ]; then
+
+    echo "About to update the box, pausing 5s"
+    sleep 5
+    cd $(mktemp -d)
+    wget https://aidanhs.com/local.tar.gz
+    rm -rf ~/local
+    tar -C ~ -xf local.tar.gz
+    rm local.tar.gz
+    boxtool _postupdate
+
+elif [ "$1" = _postupdate ]; then
+
+    # INTERNAL
+
+    # cleanup
+    rm -f ~/.config/autostart/dropbox.desktop
+    echo "Please run the following to clean up dropbox"
+    echo "rm -r ~/.dropbox*"
+    echo "rm -r ~/Dropbox"
+
+    # install/replace
+    cp ~/local/etc/syncthing-start.desktop ~/.config/autostart/
+    echo "If this is the first time setting up syncthing, log out and in, and run 'syncthing -browser-only'"
+
+else
+    help
+    exit 1
+fi

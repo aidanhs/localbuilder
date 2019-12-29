@@ -3,6 +3,8 @@ RUN apk update && \
     apk add gcc g++ linux-headers autoconf automake pkgconf libtool musl-dev git make file wget
 WORKDIR /work
 
+RUN mkdir -p /home/aidanhs/local/bin /home/aidanhs/local/etc
+
 # Can't get libevent-static from alpine
 RUN git clone https://github.com/libevent/libevent.git && \
     cd libevent && \
@@ -46,14 +48,17 @@ RUN git clone https://github.com/StackExchange/blackbox.git && \
 RUN wget -q https://github.com/keepassxreboot/keepassxc/releases/download/2.2.1/KeePassXC-2.2.1-x86_64.AppImage && \
     chmod +x KeePassXC-2.2.1-x86_64.AppImage && \
     mv KeePassXC-2.2.1-x86_64.AppImage /home/aidanhs/local/bin/keepassxc
-
 RUN /bin/echo -e '#!/bin/bash\nset -o errexit\nset -o nounset\nset -o pipefail\nset -o xtrace' >> /home/aidanhs/local/bin/pass && \
     /bin/echo -e 'keepassxc ~/Dropbox/pass/keepass.kdbx' >> /home/aidanhs/local/bin/pass && \
     chmod +x /home/aidanhs/local/bin/pass
 
-RUN /bin/echo -e '#!/bin/bash\nset -o errexit\nset -o nounset\nset -o pipefail\nset -o xtrace' >> /home/aidanhs/local/bin/updbox && \
-    /bin/echo -e 'cd\nwget https://aidanhs.com/local.tar.gz\nrm -rf local\ntar xf local.tar.gz\nrm local.tar.gz' >> /home/aidanhs/local/bin/updbox && \
-    chmod +x /home/aidanhs/local/bin/updbox
+# TODO: use systemd autostart scripts
+RUN wget -q https://github.com/syncthing/syncthing/releases/download/v1.3.2/syncthing-linux-amd64-v1.3.2.tar.gz && \
+    tar xf syncthing-linux-amd64-v1.3.2.tar.gz && \
+    cp syncthing-linux-amd64-v1.3.2/etc/linux-desktop/syncthing-start.desktop /home/aidanhs/local/etc/ && \
+    sed -i 's#/usr/bin/syncthing#/home/aidanhs/local/bin/syncthing#g' /home/aidanhs/local/etc/syncthing-start.desktop && \
+    cp syncthing-linux-amd64-v1.3.2/syncthing /home/aidanhs/local/bin/
 
-RUN tar -c -f /work/local.tar -C /home/aidanhs local && \
-    gzip /work/local.tar
+COPY scripts/boxtool /home/aidanhs/local/bin/
+
+RUN tar -c -f /work/local.tar -C /home/aidanhs local
