@@ -25,19 +25,44 @@ if [ "$1" = upd ]; then
 
 elif [ "$1" = _postupdate ]; then
 
-    # INTERNAL
+    # INTERNAL FUNCTION - DO NOT CALL
 
-    # cleanup
+    echo
+    echo "> CLEANUP"
+
     rm -f ~/.config/autostart/dropbox.desktop
     echo "Please run the following to clean up dropbox"
     echo "rm -r ~/.dropbox*"
     echo "rm -r ~/Dropbox"
 
-    # install/replace
+    echo
+    echo "> INSTALL/REPLACE"
+
+    echo "Setting up syncthing"
     cp ~/local/etc/syncthing-start.desktop ~/.config/autostart/
     echo "If this is the first time setting up syncthing, log out and in, and run 'syncthing -browser-only'"
 
+    echo "Setting up homeshick"
+    if [ ! -d ~/.homesick ]; then
+        git clone https://github.com/andsens/homeshick.git ~/.homesick/repos/homeshick
+        # --batch will *not* auto symlink
+        ~/.homesick/repos/homeshick/bin/homeshick --batch clone git@bitbucket.org:aidanhs/dotfiles.git
+        ~/.homesick/repos/homeshick/bin/homeshick link
+        chmod 600 ~/.homesick/repos/dotfiles/home/.ssh/config
+    fi
+    ~/.homesick/repos/homeshick/bin/homeshick pull
+
+    echo "Setting up tmux"
+    # Note: bash -i picks up bashrc from above so we can get tmux
+    if [ ! -d ~/.tmux/plugins/tpm ]; then
+        git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
+        bash -i ~/.tmux/plugins/tpm/bin/install_plugins
+    fi
+    bash -i ~/.tmux/plugins/tpm/bin/update_plugins all
+
 else
+
     help
     exit 1
+
 fi
