@@ -46,7 +46,7 @@ RUN wget -q https://github.com/keepassxreboot/keepassxc/releases/download/2.5.1/
     mv KeePassXC-2.5.1-x86_64.AppImage /home/aidanhs/local/bin/keepassxc && \
     chmod +x /home/aidanhs/local/bin/keepassxc
 RUN /bin/echo -e '#!/bin/bash\nset -o errexit\nset -o nounset\nset -o pipefail\nset -o xtrace' >> /home/aidanhs/local/bin/pass && \
-    /bin/echo -e 'keepassxc ~/Sync/pass/keepass.kdbx' >> /home/aidanhs/local/bin/pass && \
+    /bin/echo -e 'keepassxc ~/Sync/keepass.kdbx' >> /home/aidanhs/local/bin/pass && \
     chmod +x /home/aidanhs/local/bin/pass
 
 # TODO: use systemd autostart scripts
