@@ -6,19 +6,17 @@ WORKDIR /work
 RUN mkdir -p /home/aidanhs/local/bin /home/aidanhs/local/etc
 
 # Can't get libevent-static from alpine
-RUN git clone https://github.com/libevent/libevent.git && \
+RUN wget -q https://github.com/libevent/libevent/releases/download/release-2.1.11-stable/libevent-2.1.11-stable.tar.gz && \
+    tar -xf libevent-2.1.11-stable.tar.gz && mv libevent-2.1.11-stable libevent && \
     cd libevent && \
-    git checkout release-2.0.22-stable && \
-    sh autogen.sh && \
     ./configure --enable-static --prefix=/usr && \
     make && \
     make install
-# http://ftp.gnu.org/gnu/ncurses/ncurses-6.0.tar.gz
-ADD ncurses-6.0.tar.gz /work/
 # First line of configure flags are stolen from debian/rules in the ubuntu src tar,
 # second line is mine. Crucial flag is with-terminfo-dirs - alpine ncurses-static
 # doesn't include /lib/terminfo so misses some fundamental terminals on ubuntu.
-RUN ln -s ncurses-6.0 ncurses && \
+RUN wget -q https://invisible-mirror.net/archives/ncurses/ncurses-6.1.tar.gz && \
+    tar xf ncurses-6.1.tar.gz && mv ncurses-6.1 ncurses && \
     cd ncurses && \
     ./configure \
         --prefix=/usr --without-profile --without-debug --without-shared --disable-termcap --without-ada --without-tests --without-progs \
@@ -26,10 +24,9 @@ RUN ln -s ncurses-6.0 ncurses && \
         --disable-db-install --without-manpages && \
     make && \
     make install
-RUN git clone https://github.com/tmux/tmux.git && \
+RUN wget -q https://github.com/tmux/tmux/releases/download/3.0a/tmux-3.0a.tar.gz && \
+    tar xf tmux-3.0a.tar.gz && mv tmux-3.0a tmux && \
     cd tmux && \
-    git checkout 2.2 && \
-    sh autogen.sh && \
     ./configure --enable-static --prefix=/home/aidanhs/local && \
     make && \
     make install
@@ -45,9 +42,9 @@ RUN git clone https://github.com/StackExchange/blackbox.git && \
 # - appimagetool does not work with a musl libc, but...
 # - using ubuntu needs https://github.com/keepassxreboot/keepassxc/pull/1047, but even if that worked...
 # - taming cmake is not fun
-RUN wget -q https://github.com/keepassxreboot/keepassxc/releases/download/2.2.1/KeePassXC-2.2.1-x86_64.AppImage && \
-    chmod +x KeePassXC-2.2.1-x86_64.AppImage && \
-    mv KeePassXC-2.2.1-x86_64.AppImage /home/aidanhs/local/bin/keepassxc
+RUN wget -q https://github.com/keepassxreboot/keepassxc/releases/download/2.5.1/KeePassXC-2.5.1-x86_64.AppImage && \
+    mv KeePassXC-2.5.1-x86_64.AppImage /home/aidanhs/local/bin/keepassxc && \
+    chmod +x /home/aidanhs/local/bin/keepassxc
 RUN /bin/echo -e '#!/bin/bash\nset -o errexit\nset -o nounset\nset -o pipefail\nset -o xtrace' >> /home/aidanhs/local/bin/pass && \
     /bin/echo -e 'keepassxc ~/Sync/pass/keepass.kdbx' >> /home/aidanhs/local/bin/pass && \
     chmod +x /home/aidanhs/local/bin/pass
