@@ -1,4 +1,4 @@
-FROM alpine:3.6
+FROM alpine:3.11
 RUN apk update && \
     apk add gcc g++ linux-headers autoconf automake pkgconf libtool musl-dev git make file wget
 WORKDIR /work
