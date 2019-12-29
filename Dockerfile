@@ -56,6 +56,6 @@ RUN wget -q https://github.com/syncthing/syncthing/releases/download/v1.3.2/sync
     sed -i 's#/usr/bin/syncthing#/home/aidanhs/local/bin/syncthing#g' /home/aidanhs/local/etc/syncthing-start.desktop && \
     cp syncthing-linux-amd64-v1.3.2/syncthing /home/aidanhs/local/bin/
 
-COPY scripts/boxtool /home/aidanhs/local/bin/
+COPY fuse-overlayfs scripts/boxtool /home/aidanhs/local/bin/
 
 RUN tar -c -f /work/local.tar -C /home/aidanhs local

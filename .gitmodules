@@ -1,0 +1,3 @@
+[submodule "fuse-overlayfs"]
+	path = fuse-overlayfs-repo
+	url = git@github.com:containers/fuse-overlayfs.git

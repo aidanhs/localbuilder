@@ -60,6 +60,8 @@ elif [ "$1" = _postupdate ]; then
     fi
     bash -i ~/.tmux/plugins/tpm/bin/update_plugins all
 
+    echo "Make sure to log in and log out to pick up any bashrc changes!"
+
 else
 
     help
