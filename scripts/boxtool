@@ -30,10 +30,18 @@ elif [ "$1" = _postupdate ]; then
     echo
     echo "> CLEANUP"
 
-    rm -f ~/.config/autostart/dropbox.desktop
-    echo "Please run the following to clean up dropbox"
-    echo "rm -r ~/.dropbox*"
-    echo "rm -r ~/Dropbox"
+    if [ -e ~/.config/autostart/dropbox.desktop -o -e ~/.dropbox -o -e ~/Dropbox ]; then
+        rm -f ~/.config/autostart/dropbox.desktop
+        echo "Please run the following to clean up dropbox"
+        echo "rm -r ~/.dropbox*"
+        echo "rm -r ~/Dropbox"
+        sleep 15
+    fi
+    if [ -e ~/.vim ]; then
+        echo "Please run the following to clean up vim"
+        echo "rm -r ~/.vim"
+        sleep 15
+    fi
 
     echo
     echo "> INSTALL/REPLACE"

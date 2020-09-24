@@ -5,12 +5,13 @@ WORKDIR /work
 
 RUN mkdir -p /home/aidanhs/local/bin /home/aidanhs/local/etc
 
+# 2020-09-23
 # Can't get libevent-static from alpine
-RUN VSN=2.1.11-stable && \
+RUN VSN=2.1.12-stable && \
     wget -q https://github.com/libevent/libevent/releases/download/release-$VSN/libevent-$VSN.tar.gz && \
     tar -xf libevent-$VSN.tar.gz && mv libevent-$VSN libevent && \
     cd libevent && \
-    ./configure --enable-static --prefix=/usr && \
+    ./configure --enable-static --prefix=/usr --disable-openssl && \
     make && \
     make install
 # First line of configure flags are stolen from debian/rules in the ubuntu src tar,
@@ -26,26 +27,28 @@ RUN VSN=6.1 && \
         --disable-db-install --without-manpages && \
     make && \
     make install
-RUN VSN=3.0a && \
-    wget -q https://github.com/tmux/tmux/releases/download/3.0a/tmux-3.0a.tar.gz && \
+RUN VSN=3.1b && \
+    wget -q https://github.com/tmux/tmux/releases/download/$VSN/tmux-$VSN.tar.gz && \
     tar xf tmux-$VSN.tar.gz && mv tmux-$VSN tmux && \
     cd tmux && \
     ./configure --enable-static --prefix=/home/aidanhs/local && \
     make && \
     make install
 
+# 2020-06-20
 RUN git clone https://github.com/StackExchange/blackbox.git && \
     cd blackbox && \
-    git checkout v1.20170611 && \
+    git checkout v1.20200429 && \
     cp -r bin/* /home/aidanhs/local/bin/ && \
     rm /home/aidanhs/local/bin/Makefile
 
+# 2020-09-23
 # Really I should build this myself to have a statically linked binary with only extensions I want but
 # - an appimage is 'good enough' when fuse is accessible, but...
 # - appimagetool does not work with a musl libc, but...
 # - using ubuntu needs https://github.com/keepassxreboot/keepassxc/pull/1047, but even if that worked...
 # - taming cmake is not fun
-RUN VSN=2.5.4 && \
+RUN VSN=2.6.1 && \
     wget -q https://github.com/keepassxreboot/keepassxc/releases/download/$VSN/KeePassXC-$VSN-x86_64.AppImage && \
     mv KeePassXC-$VSN-x86_64.AppImage /home/aidanhs/local/bin/keepassxc && \
     chmod +x /home/aidanhs/local/bin/keepassxc
@@ -53,15 +56,14 @@ RUN /bin/echo -e '#!/bin/bash\nset -o errexit\nset -o nounset\nset -o pipefail\n
     /bin/echo -e 'keepassxc ~/Sync/keepass.kdbx' >> /home/aidanhs/local/bin/pass && \
     chmod +x /home/aidanhs/local/bin/pass
 
+# 2020-09-23
 # TODO: use systemd autostart scripts
-RUN VSN=v1.4.2 && \
+RUN VSN=v1.9.0 && \
     wget -q https://github.com/syncthing/syncthing/releases/download/$VSN/syncthing-linux-amd64-$VSN.tar.gz && \
     tar xf syncthing-linux-amd64-$VSN.tar.gz && \
     cp syncthing-linux-amd64-$VSN/etc/linux-desktop/syncthing-start.desktop /home/aidanhs/local/etc/ && \
     sed -i 's#/usr/bin/syncthing#/home/aidanhs/local/bin/syncthing#g' /home/aidanhs/local/etc/syncthing-start.desktop && \
     cp syncthing-linux-amd64-$VSN/syncthing /home/aidanhs/local/bin/
-
-COPY fuse-overlayfs scripts/boxtool /home/aidanhs/local/bin/
 
 RUN VSN=12.0.1 && \
     wget -q https://github.com/BurntSushi/ripgrep/releases/download/$VSN/ripgrep-$VSN-x86_64-unknown-linux-musl.tar.gz && \
@@ -78,9 +80,36 @@ RUN VSN=v7.5.0 && \
     tar xf fd-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     cp fd-$VSN-x86_64-unknown-linux-musl/fd /home/aidanhs/local/bin/
 
+# 2020-04-30
 RUN VSN=v0.15.0 && \
     wget -q https://github.com/sharkdp/bat/releases/download/$VSN/bat-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     tar xf bat-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     cp bat-$VSN-x86_64-unknown-linux-musl/bat /home/aidanhs/local/bin/
+
+RUN VSN=0.2.13 && \
+    wget -q https://github.com/mozilla/sccache/releases/download/$VSN/sccache-$VSN-x86_64-unknown-linux-musl.tar.gz && \
+    tar xf sccache-$VSN-x86_64-unknown-linux-musl.tar.gz && \
+    cp sccache-$VSN-x86_64-unknown-linux-musl/sccache /home/aidanhs/local/bin/
+
+# 2020-09-24
+# 0.5.0 nightly as of 24-09-2020
+COPY nvim-linux64.tar.gz .
+RUN true && \
+    tar xf nvim-linux64.tar.gz && \
+    cp -r nvim-linux64/* /home/aidanhs/local/ && \
+    cd /home/aidanhs/local/bin/ && ln -s nvim vim
+#RUN VSN=v0.4.3 && \
+#    wget -q https://github.com/neovim/neovim/releases/download/$VSN/nvim-linux64.tar.gz && \
+#    tar xf nvim-linux64.tar.gz && \
+#    cp -r nvim-linux64/* /home/aidanhs/local/ && \
+#    cd /home/aidanhs/local/bin/ && ln -s nvim vim
+
+# 2020-09-23
+RUN VSN=1.7.5 && \
+    wget -q https://github.com/Zettlr/Zettlr/releases/download/v$VSN/Zettlr-$VSN-x86_64.AppImage && \
+    mv Zettlr-$VSN-x86_64.AppImage /home/aidanhs/local/bin/zettlr
+
+COPY fuse-overlayfs /home/aidanhs/local/bin/
+COPY scripts/boxtool /home/aidanhs/local/bin/
 
 RUN tar -c -f /work/local.tar -C /home/aidanhs local
