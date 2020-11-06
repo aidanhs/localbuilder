@@ -1,4 +1,4 @@
-FROM alpine:3.11
+FROM alpine:3.12
 RUN apk update && \
     apk add gcc g++ linux-headers autoconf automake pkgconf libtool musl-dev git make file wget
 WORKDIR /work
@@ -48,7 +48,7 @@ RUN git clone https://github.com/StackExchange/blackbox.git && \
 # - appimagetool does not work with a musl libc, but...
 # - using ubuntu needs https://github.com/keepassxreboot/keepassxc/pull/1047, but even if that worked...
 # - taming cmake is not fun
-RUN VSN=2.6.1 && \
+RUN VSN=2.6.2 && \
     wget -q https://github.com/keepassxreboot/keepassxc/releases/download/$VSN/KeePassXC-$VSN-x86_64.AppImage && \
     mv KeePassXC-$VSN-x86_64.AppImage /home/aidanhs/local/bin/keepassxc && \
     chmod +x /home/aidanhs/local/bin/keepassxc
@@ -104,10 +104,17 @@ RUN true && \
 #    cp -r nvim-linux64/* /home/aidanhs/local/ && \
 #    cd /home/aidanhs/local/bin/ && ln -s nvim vim
 
+RUN VSN=2020-09-21 && \
+    wget -q https://github.com/rust-analyzer/rust-analyzer/releases/download/$VSN/rust-analyzer-linux.gz && \
+    gunzip rust-analyzer-linux.gz && \
+    mv rust-analyzer-linux /home/aidanhs/local/bin/rust-analyzer && \
+    chmod +x /home/aidanhs/local/bin/rust-analyzer
+
 # 2020-09-23
 RUN VSN=1.7.5 && \
     wget -q https://github.com/Zettlr/Zettlr/releases/download/v$VSN/Zettlr-$VSN-x86_64.AppImage && \
-    mv Zettlr-$VSN-x86_64.AppImage /home/aidanhs/local/bin/zettlr
+    mv Zettlr-$VSN-x86_64.AppImage /home/aidanhs/local/bin/zettlr && \
+    chmod +x /home/aidanhs/local/bin/zettlr
 
 COPY fuse-overlayfs /home/aidanhs/local/bin/
 COPY scripts/boxtool /home/aidanhs/local/bin/
