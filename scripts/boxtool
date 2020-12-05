@@ -51,7 +51,7 @@ elif [ "$1" = _postupdate ]; then
         git clone https://github.com/andsens/homeshick.git ~/.homesick/repos/homeshick
         # --batch will *not* auto symlink
         ~/.homesick/repos/homeshick/bin/homeshick --batch clone git@bitbucket.org:aidanhs/dotfiles.git
-        ~/.homesick/repos/homeshick/bin/homeshick link
+        ~/.homesick/repos/homeshick/bin/homeshick symlink
         chmod 600 ~/.homesick/repos/dotfiles/home/.ssh/config
     fi
     ~/.homesick/repos/homeshick/bin/homeshick pull
