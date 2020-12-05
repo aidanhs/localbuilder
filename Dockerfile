@@ -110,8 +110,8 @@ RUN VSN=2020-09-21 && \
     mv rust-analyzer-linux /home/aidanhs/local/bin/rust-analyzer && \
     chmod +x /home/aidanhs/local/bin/rust-analyzer
 
-# 2020-09-23
-RUN VSN=1.7.5 && \
+# 2020-12-05
+RUN VSN=1.8.1 && \
     wget -q https://github.com/Zettlr/Zettlr/releases/download/v$VSN/Zettlr-$VSN-x86_64.AppImage && \
     mv Zettlr-$VSN-x86_64.AppImage /home/aidanhs/local/bin/zettlr && \
     chmod +x /home/aidanhs/local/bin/zettlr
