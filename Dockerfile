@@ -30,10 +30,20 @@ RUN VSN=6.2 && \
         --disable-db-install --without-manpages && \
     make && \
     make install
-RUN VSN=3.1b && \
-    wget -q https://github.com/tmux/tmux/releases/download/$VSN/tmux-$VSN.tar.gz && \
-    tar xf tmux-$VSN.tar.gz && mv tmux-$VSN tmux && \
+# https://github.com/tmux/tmux/issues/2694
+#RUN VSN=3.2 && \
+#    wget -q https://github.com/tmux/tmux/releases/download/$VSN/tmux-$VSN.tar.gz && \
+#    tar xf tmux-$VSN.tar.gz && mv tmux-$VSN tmux && \
+#    cd tmux && \
+#    ./configure --enable-static --prefix=/home/aidanhs/local && \
+#    make && \
+#    make install
+RUN VSN=f2951bd4 && \
+    apk add byacc && \
+    git clone https://github.com/tmux/tmux.git tmux && \
     cd tmux && \
+    git checkout $VSN && \
+    sh autogen.sh && \
     ./configure --enable-static --prefix=/home/aidanhs/local && \
     make && \
     make install
