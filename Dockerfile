@@ -140,5 +140,3 @@ RUN VSN=1.8.7 && \
 COPY fuse-overlayfs /home/aidanhs/local/bin/
 COPY scripts/boxtool /home/aidanhs/local/bin/
 COPY systemd/* /home/aidanhs/local/etc/systemd/
-
-RUN tar -c -f /out/local.tar -C /home/aidanhs local
