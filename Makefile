@@ -1,13 +1,11 @@
-.PHONY: build localbuilder install
+.PHONY: build install
 
 default: build
-
-GRAB = podman run --rm localbuilder cat
 
 build: local.tar.gz
 
 fuse-overlayfs:
-	cd fuse-overlayfs-repo && podman build -v $$(pwd):/build/fuse-overlayfs -t fuse-overlayfs -f ./Dockerfile.static.ubuntu .
+	cd fuse-overlayfs-repo && git clean -fxd && podman build -v $$(pwd):/build/fuse-overlayfs -t fuse-overlayfs -f ./Containerfile.static.ubuntu .
 	cp fuse-overlayfs-repo/fuse-overlayfs .
 
 install: local.tar.gz
@@ -17,8 +15,6 @@ install: local.tar.gz
 deploy: local.tar.gz
 	rsync -av --progress $< aidanhs.com:/var/www/aidanhs/$<
 
-localbuilder:
-	tar -c -f - Dockerfile fuse-overlayfs *.tar.gz scripts | podman build --tag localbuilder -
-
-local.tar.gz: localbuilder
-	$(GRAB) /work/local.tar | gzip --rsyncable -c > $@
+local.tar.gz: Dockerfile fuse-overlayfs ncurses-6.0.tar.gz nvim-linux64.tar.gz $(shell find scripts systemd -type f)
+	tar -c -f - $^ | podman build -v $$(pwd):/out --tag localbuilder -
+	gzip --rsyncable -f local.tar

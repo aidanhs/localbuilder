@@ -4,7 +4,7 @@ set -o nounset
 set -o pipefail
 
 help() {
-    echo "Invalid command: choose one of 'upd'"
+    echo "Invalid command: choose one of 'upd' 'updfrom'"
 }
 
 if [ "$#" -lt 1 ]; then
@@ -23,6 +23,16 @@ if [ "$1" = upd ]; then
     rm local.tar.gz
     boxtool _postupdate
 
+elif [ "$1" = updfrom ]; then
+
+    shift
+    if [ "$#" != 1 ]; then
+        echo "Need a tar to update from"
+    fi
+    rm -rf ~/local
+    tar -C ~ -xf "$1"
+    boxtool _postupdate
+
 elif [ "$1" = _postupdate ]; then
 
     # INTERNAL FUNCTION - DO NOT CALL
@@ -37,14 +47,12 @@ elif [ "$1" = _postupdate ]; then
         echo "rm -r ~/Dropbox"
         sleep 15
     fi
+    if [ -e ~/.config/autostart/syncthing-start.desktop ]; then
+        rm -f ~/.config/autostart/syncthing-start.desktop
+    fi
 
     echo
     echo "> INSTALL/REPLACE"
-
-    echo "Setting up syncthing for desktop machines"
-    mkdir -p ~/.config/autostart
-    cp ~/local/etc/syncthing-start.desktop ~/.config/autostart/
-    echo "If this is the first time setting up syncthing, log out and in, and run 'syncthing -browser-only'"
 
     echo "Setting up homeshick"
     if [ ! -d ~/.homesick ]; then
@@ -68,7 +76,25 @@ elif [ "$1" = _postupdate ]; then
     echo "Setting up nvim"
     ~/local/bin/nvim --headless -c ':PlugInstall' -c ':qa'
 
+    echo "Deleting existing systemd units"
+    if [ -d ~/.config/systemd/user ]; then
+        for f in ~/.config/systemd/user/*.service; do
+            systemctl --user disable $(basename $f)
+        done
+        rm -r ~/.config/systemd/user
+    fi
+    echo "Registering new systemd units"
+    mkdir -p ~/.config/systemd/user
+    if [ -d ~/local/etc/systemd ]; then
+        cp ~/local/etc/systemd/* ~/.config/systemd/user/
+    fi
+    for f in ~/.config/systemd/user/*.service; do
+        systemctl --user enable $(basename $f)
+        systemctl --user start $(basename $f)
+    done
+
     echo "Make sure to log in and log out to pick up any bashrc changes!"
+    echo "If this a first time setup, log out and in, and run 'syncthing serve --browser-only'"
 
 else
 

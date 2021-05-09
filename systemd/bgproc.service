@@ -1,0 +1,21 @@
+# Mostly copied from the syncthing.service
+[Unit]
+Description=bgproc - scheduled task runner
+
+[Service]
+ExecStart=/home/aidanhs/local/bin/bgproc /home/aidanhs/.config/aidanhs/bgproc
+#Environment=LOGFILE=/dev/null
+Restart=on-failure
+RestartSec=1
+StartLimitIntervalSec=60
+StartLimitBurst=4
+SuccessExitStatus=3 4
+RestartForceExitStatus=3 4
+
+# Hardening
+SystemCallArchitectures=native
+MemoryDenyWriteExecute=true
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target
