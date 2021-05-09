@@ -3,7 +3,7 @@
 Description=bgproc - scheduled task runner
 
 [Service]
-ExecStart=/home/aidanhs/local/bin/bgproc /home/aidanhs/.config/aidanhs/bgproc
+ExecStart=/bin/bash -c 'PATH=/home/aidanhs/local/bin:$PATH exec /home/aidanhs/local/bin/bgproc /home/aidanhs/.config/aidanhs/bgproc'
 #Environment=LOGFILE=/dev/null
 Restart=on-failure
 RestartSec=1
