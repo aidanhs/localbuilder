@@ -1,4 +1,4 @@
-FROM alpine:3.13
+FROM alpine:3.15
 RUN apk update && \
     apk add gcc g++ linux-headers autoconf automake pkgconf libtool musl-dev git make file wget && \
     apk add libgcc curl && \
@@ -8,7 +8,7 @@ WORKDIR /work
 
 RUN mkdir -p /home/aidanhs/local/bin /home/aidanhs/local/etc /home/aidanhs/local/etc/systemd
 
-# 2021-05-09 - tmux
+# 2021-12-28 - tmux
 # Can't get libevent-static from alpine
 RUN VSN=2.1.12-stable && \
     wget -q https://github.com/libevent/libevent/releases/download/release-$VSN/libevent-$VSN.tar.gz && \
@@ -30,20 +30,12 @@ RUN VSN=6.2 && \
         --disable-db-install --without-manpages && \
     make && \
     make install
-# https://github.com/tmux/tmux/issues/2694
-#RUN VSN=3.2 && \
-#    wget -q https://github.com/tmux/tmux/releases/download/$VSN/tmux-$VSN.tar.gz && \
-#    tar xf tmux-$VSN.tar.gz && mv tmux-$VSN tmux && \
-#    cd tmux && \
-#    ./configure --enable-static --prefix=/home/aidanhs/local && \
-#    make && \
-#    make install
-RUN VSN=f2951bd4 && \
-    apk add byacc && \
-    git clone https://github.com/tmux/tmux.git tmux && \
+COPY tmux.patch /work/
+RUN VSN=3.3-rc && \
+    wget -q https://github.com/tmux/tmux/releases/download/$VSN/tmux-$VSN.tar.gz && \
+    tar xf tmux-$VSN.tar.gz && mv tmux-$VSN tmux && \
     cd tmux && \
-    git checkout $VSN && \
-    sh autogen.sh && \
+    git apply </work/tmux.patch && \
     ./configure --enable-static --prefix=/home/aidanhs/local && \
     make && \
     make install
@@ -67,13 +59,13 @@ RUN git clone https://github.com/StackExchange/blackbox.git && \
     cp -r bin/* /home/aidanhs/local/bin/ && \
     rm /home/aidanhs/local/bin/Makefile
 
-# 2021-04-17 - keepassxc
+# 2021-12-28 - keepassxc
 # Really I should build this myself to have a statically linked binary with only extensions I want but
 # - an appimage is 'good enough' when fuse is accessible, but...
 # - appimagetool does not work with a musl libc, but...
 # - using ubuntu needs https://github.com/keepassxreboot/keepassxc/pull/1047, but even if that worked...
 # - taming cmake is not fun
-RUN VSN=2.6.4 && \
+RUN VSN=2.6.6 && \
     wget -q https://github.com/keepassxreboot/keepassxc/releases/download/$VSN/KeePassXC-$VSN-x86_64.AppImage && \
     mv KeePassXC-$VSN-x86_64.AppImage /home/aidanhs/local/bin/keepassxc && \
     chmod +x /home/aidanhs/local/bin/keepassxc
@@ -121,28 +113,28 @@ RUN VSN=v0.2.15 && \
     tar xf sccache-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     cp sccache-$VSN-x86_64-unknown-linux-musl/sccache /home/aidanhs/local/bin/
 
-# 2021-04-17 - nvim
-# 0.5.0 nightly as of date above
-COPY nvim-linux64.tar.gz .
-RUN true && \
+# 2021-12-28 - nvim
+RUN VSN=v0.6.0 && \
+    wget -q https://github.com/neovim/neovim/releases/download/$VSN/nvim-linux64.tar.gz && \
     tar xf nvim-linux64.tar.gz && \
     cp -r nvim-linux64/* /home/aidanhs/local/ && \
     cd /home/aidanhs/local/bin/ && ln -s nvim vim
-#RUN VSN=v0.4.3 && \
-#    wget -q https://github.com/neovim/neovim/releases/download/$VSN/nvim-linux64.tar.gz && \
-#    tar xf nvim-linux64.tar.gz && \
-#    cp -r nvim-linux64/* /home/aidanhs/local/ && \
-#    cd /home/aidanhs/local/bin/ && ln -s nvim vim
 
-# ?-?-? - rust-analyzer
-RUN VSN=2020-09-21 && \
-    wget -q https://github.com/rust-analyzer/rust-analyzer/releases/download/$VSN/rust-analyzer-linux.gz && \
-    gunzip rust-analyzer-linux.gz && \
-    mv rust-analyzer-linux /home/aidanhs/local/bin/rust-analyzer && \
+# 2021-12-28 - rust-analyzer
+RUN VSN=2021-12-27 && \
+    wget -q https://github.com/rust-analyzer/rust-analyzer/releases/download/$VSN/rust-analyzer-x86_64-unknown-linux-musl.gz && \
+    gunzip rust-analyzer-x86_64-unknown-linux-musl.gz && \
+    mv rust-analyzer-x86_64-unknown-linux-musl /home/aidanhs/local/bin/rust-analyzer && \
     chmod +x /home/aidanhs/local/bin/rust-analyzer
 
-# 2021-04-17 - zettlr
-RUN VSN=1.8.7 && \
+# 2021-12-28 - jq
+RUN VSN=1.6 && \
+    wget -q https://github.com/stedolan/jq/releases/download/jq-1.6/jq-linux64 && \
+    mv jq-linux64 /home/aidanhs/local/bin/jq && \
+    chmod +x /home/aidanhs/local/bin/jq
+
+# 2021-12-28 - zettlr
+RUN VSN=2.1.0 && \
     wget -q https://github.com/Zettlr/Zettlr/releases/download/v$VSN/Zettlr-$VSN-x86_64.AppImage && \
     mv Zettlr-$VSN-x86_64.AppImage /home/aidanhs/local/bin/zettlr && \
     chmod +x /home/aidanhs/local/bin/zettlr
