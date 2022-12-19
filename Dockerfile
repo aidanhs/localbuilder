@@ -8,7 +8,7 @@ WORKDIR /work
 
 RUN mkdir -p /home/aidanhs/local/bin /home/aidanhs/local/etc /home/aidanhs/local/etc/systemd
 
-# 2021-12-28 - tmux
+# 2022-06-03 - tmux
 # Can't get libevent-static from alpine
 RUN VSN=2.1.12-stable && \
     wget -q https://github.com/libevent/libevent/releases/download/release-$VSN/libevent-$VSN.tar.gz && \
@@ -20,7 +20,7 @@ RUN VSN=2.1.12-stable && \
 # First line of configure flags are stolen from debian/rules in the ubuntu src tar,
 # second line is mine. Crucial flag is with-terminfo-dirs - alpine ncurses-static
 # doesn't include /lib/terminfo so misses some fundamental terminals on ubuntu.
-RUN VSN=6.2 && \
+RUN VSN=6.3 && \
     wget -q https://invisible-mirror.net/archives/ncurses/ncurses-$VSN.tar.gz && \
     tar xf ncurses-$VSN.tar.gz && mv ncurses-$VSN ncurses && \
     cd ncurses && \
@@ -30,24 +30,22 @@ RUN VSN=6.2 && \
         --disable-db-install --without-manpages && \
     make && \
     make install
-COPY tmux.patch /work/
-RUN VSN=3.3-rc && \
+RUN VSN=3.3 && \
     wget -q https://github.com/tmux/tmux/releases/download/$VSN/tmux-$VSN.tar.gz && \
     tar xf tmux-$VSN.tar.gz && mv tmux-$VSN tmux && \
     cd tmux && \
-    git apply </work/tmux.patch && \
     ./configure --enable-static --prefix=/home/aidanhs/local && \
     make && \
     make install
 
-# 2021-05-09 - bgproc/evry
-RUN VSN=425bb2f21d7 && \
+# 2022-06-03 - bgproc/evry
+RUN VSN=db2fc09 && \
     git clone https://github.com/seanbreckenridge/evry.git && \
     cd evry && \
     git checkout $VSN && \
     cargo build --release --target x86_64-unknown-linux-musl && \
     cp target/x86_64-unknown-linux-musl/release/evry /home/aidanhs/local/bin/
-RUN VSN=4434003d356f && \
+RUN VSN=7da55a6 && \
     wget -q https://raw.githubusercontent.com/seanbreckenridge/bgproc/$VSN/bgproc && \
     mv bgproc /home/aidanhs/local/bin/ && \
     chmod +x /home/aidanhs/local/bin/bgproc
@@ -65,7 +63,7 @@ RUN git clone https://github.com/StackExchange/blackbox.git && \
 # - appimagetool does not work with a musl libc, but...
 # - using ubuntu needs https://github.com/keepassxreboot/keepassxc/pull/1047, but even if that worked...
 # - taming cmake is not fun
-RUN VSN=2.6.6 && \
+RUN VSN=2.7.1 && \
     wget -q https://github.com/keepassxreboot/keepassxc/releases/download/$VSN/KeePassXC-$VSN-x86_64.AppImage && \
     mv KeePassXC-$VSN-x86_64.AppImage /home/aidanhs/local/bin/keepassxc && \
     chmod +x /home/aidanhs/local/bin/keepassxc
@@ -73,9 +71,9 @@ RUN /bin/echo -e '#!/bin/bash\nset -o errexit\nset -o nounset\nset -o pipefail\n
     /bin/echo -e 'keepassxc ~/Sync/keepass.kdbx' >> /home/aidanhs/local/bin/pass && \
     chmod +x /home/aidanhs/local/bin/pass
 
-# 2021-04-17 - syncthing
+# 2022-06-03 - syncthing
 # TODO: use systemd autostart scripts
-RUN VSN=v1.15.1 && \
+RUN VSN=v1.20.1 && \
     wget -q https://github.com/syncthing/syncthing/releases/download/$VSN/syncthing-linux-amd64-$VSN.tar.gz && \
     tar xf syncthing-linux-amd64-$VSN.tar.gz && \
     cp syncthing-linux-amd64-$VSN/etc/linux-systemd/user/syncthing.service /home/aidanhs/local/etc/systemd/ && \
@@ -113,15 +111,15 @@ RUN VSN=v0.2.15 && \
     tar xf sccache-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     cp sccache-$VSN-x86_64-unknown-linux-musl/sccache /home/aidanhs/local/bin/
 
-# 2021-12-28 - nvim
-RUN VSN=v0.6.0 && \
+# 2022-06-03 - nvim
+RUN VSN=v0.7.0 && \
     wget -q https://github.com/neovim/neovim/releases/download/$VSN/nvim-linux64.tar.gz && \
     tar xf nvim-linux64.tar.gz && \
     cp -r nvim-linux64/* /home/aidanhs/local/ && \
     cd /home/aidanhs/local/bin/ && ln -s nvim vim
 
-# 2021-12-28 - rust-analyzer
-RUN VSN=2021-12-27 && \
+# 2022-06-03 - rust-analyzer
+RUN VSN=2022-05-30 && \
     wget -q https://github.com/rust-analyzer/rust-analyzer/releases/download/$VSN/rust-analyzer-x86_64-unknown-linux-musl.gz && \
     gunzip rust-analyzer-x86_64-unknown-linux-musl.gz && \
     mv rust-analyzer-x86_64-unknown-linux-musl /home/aidanhs/local/bin/rust-analyzer && \
@@ -133,8 +131,8 @@ RUN VSN=1.6 && \
     mv jq-linux64 /home/aidanhs/local/bin/jq && \
     chmod +x /home/aidanhs/local/bin/jq
 
-# 2021-12-28 - zettlr
-RUN VSN=2.1.0 && \
+# 2022-06-03 - zettlr
+RUN VSN=2.2.6 && \
     wget -q https://github.com/Zettlr/Zettlr/releases/download/v$VSN/Zettlr-$VSN-x86_64.AppImage && \
     mv Zettlr-$VSN-x86_64.AppImage /home/aidanhs/local/bin/zettlr && \
     chmod +x /home/aidanhs/local/bin/zettlr

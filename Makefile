@@ -15,7 +15,7 @@ install: local.tar.gz
 deploy: local.tar.gz
 	rsync -av --progress $< aidanhs.com:/var/www/aidanhs/$<
 
-local.tar.gz: Dockerfile fuse-overlayfs ncurses-6.0.tar.gz $(shell find scripts systemd -type f) tmux.patch
+local.tar.gz: Dockerfile fuse-overlayfs $(shell find scripts systemd -type f)
 	tar -c -f - $^ | podman build -v $$(pwd):/out --tag localbuilder -
 	podman run --rm -v $$(pwd):/out localbuilder tar -c -f /out/local.tar -C /home/aidanhs local
 	gzip --rsyncable -f local.tar
