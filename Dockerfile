@@ -105,8 +105,8 @@ RUN VSN=v0.15.0 && \
     tar xf bat-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     cp bat-$VSN-x86_64-unknown-linux-musl/bat /home/aidanhs/local/bin/
 
-# 2021-04-17 - sccache
-RUN VSN=v0.2.15 && \
+# 2023-04-22 - sccache
+RUN VSN=v0.4.2 && \
     wget -q https://github.com/mozilla/sccache/releases/download/$VSN/sccache-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     tar xf sccache-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     cp sccache-$VSN-x86_64-unknown-linux-musl/sccache /home/aidanhs/local/bin/
@@ -136,6 +136,18 @@ RUN VSN=2.2.6 && \
     wget -q https://github.com/Zettlr/Zettlr/releases/download/v$VSN/Zettlr-$VSN-x86_64.AppImage && \
     mv Zettlr-$VSN-x86_64.AppImage /home/aidanhs/local/bin/zettlr && \
     chmod +x /home/aidanhs/local/bin/zettlr
+
+# 2023-04-28 - zellij
+RUN VSN=0.36.0 && \
+    wget -q https://github.com/zellij-org/zellij/releases/download/v$VSN/zellij-x86_64-unknown-linux-musl.tar.gz && \
+    tar xf zellij-x86_64-unknown-linux-musl.tar.gz && \
+    cp zellij /home/aidanhs/local/bin/
+
+# 2023-04-28 - helix
+RUN VSN=23.03 && \
+    wget -q https://github.com/helix-editor/helix/releases/download/$VSN/helix-$VSN-x86_64-linux.tar.xz && \
+    tar xf helix-$VSN-x86_64-linux.tar.xz && \
+    cp -r helix-23.03-x86_64-linux/* /home/aidanhs/local/bin/
 
 COPY fuse-overlayfs /home/aidanhs/local/bin/
 COPY scripts/boxtool /home/aidanhs/local/bin/

@@ -16,6 +16,6 @@ deploy: local.tar.gz
 	rsync -av --progress $< aidanhs.com:/var/www/aidanhs/$<
 
 local.tar.gz: Dockerfile fuse-overlayfs $(shell find scripts systemd -type f)
-	tar -c -f - $^ | podman build -v $$(pwd):/out --tag localbuilder -
+	tar -c -f - $^ | podman build --tag localbuilder -
 	podman run --rm -v $$(pwd):/out localbuilder tar -c -f /out/local.tar -C /home/aidanhs local
 	gzip --rsyncable -f local.tar
