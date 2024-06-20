@@ -40,13 +40,6 @@ elif [ "$1" = _postupdate ]; then
     echo
     echo "> CLEANUP"
 
-    if [ -e ~/.config/autostart/dropbox.desktop -o -e ~/.dropbox -o -e ~/Dropbox ]; then
-        rm -f ~/.config/autostart/dropbox.desktop
-        echo "Please run the following to clean up dropbox"
-        echo "rm -r ~/.dropbox*"
-        echo "rm -r ~/Dropbox"
-        sleep 15
-    fi
     if [ -e ~/.config/autostart/syncthing-start.desktop ]; then
         rm -f ~/.config/autostart/syncthing-start.desktop
     fi
@@ -64,17 +57,6 @@ elif [ "$1" = _postupdate ]; then
     fi
     ~/.homesick/repos/homeshick/bin/homeshick pull
     ~/.homesick/repos/homeshick/bin/homeshick symlink
-
-    echo "Setting up tmux"
-    # Note: bash -i picks up bashrc from above so we can get tmux
-    if [ ! -d ~/.tmux/plugins/tpm ]; then
-        git clone https://github.com/tmux-plugins/tpm ~/.tmux/plugins/tpm
-        bash -i ~/.tmux/plugins/tpm/bin/install_plugins
-    fi
-    bash -i ~/.tmux/plugins/tpm/bin/update_plugins all
-
-    echo "Setting up nvim"
-    ~/local/bin/nvim --headless -c ':PlugInstall' -c ':qa'
 
     echo "Deleting existing systemd units"
     if [ -d ~/.config/systemd/user ]; then

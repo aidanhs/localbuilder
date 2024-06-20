@@ -1,4 +1,4 @@
-FROM alpine:3.15
+FROM alpine:3.19
 RUN apk update && \
     apk add gcc g++ linux-headers autoconf automake pkgconf libtool musl-dev git make file wget && \
     apk add libgcc curl && \
@@ -7,36 +7,6 @@ ENV PATH="/root/.cargo/bin:$PATH"
 WORKDIR /work
 
 RUN mkdir -p /home/aidanhs/local/bin /home/aidanhs/local/etc /home/aidanhs/local/etc/systemd
-
-# 2022-06-03 - tmux
-# Can't get libevent-static from alpine
-RUN VSN=2.1.12-stable && \
-    wget -q https://github.com/libevent/libevent/releases/download/release-$VSN/libevent-$VSN.tar.gz && \
-    tar -xf libevent-$VSN.tar.gz && mv libevent-$VSN libevent && \
-    cd libevent && \
-    ./configure --enable-static --prefix=/usr --disable-openssl && \
-    make && \
-    make install
-# First line of configure flags are stolen from debian/rules in the ubuntu src tar,
-# second line is mine. Crucial flag is with-terminfo-dirs - alpine ncurses-static
-# doesn't include /lib/terminfo so misses some fundamental terminals on ubuntu.
-RUN VSN=6.3 && \
-    wget -q https://invisible-mirror.net/archives/ncurses/ncurses-$VSN.tar.gz && \
-    tar xf ncurses-$VSN.tar.gz && mv ncurses-$VSN ncurses && \
-    cd ncurses && \
-    ./configure \
-        --prefix=/usr --without-profile --without-debug --without-shared --disable-termcap --without-ada --without-tests --without-progs \
-        --with-terminfo-dirs="/etc/terminfo:/lib/terminfo:/usr/share/terminfo" --with-default-terminfo-dir=/etc/terminfo \
-        --disable-db-install --without-manpages && \
-    make && \
-    make install
-RUN VSN=3.3 && \
-    wget -q https://github.com/tmux/tmux/releases/download/$VSN/tmux-$VSN.tar.gz && \
-    tar xf tmux-$VSN.tar.gz && mv tmux-$VSN tmux && \
-    cd tmux && \
-    ./configure --enable-static --prefix=/home/aidanhs/local && \
-    make && \
-    make install
 
 # 2022-06-03 - bgproc/evry
 RUN VSN=db2fc09 && \
@@ -81,26 +51,32 @@ RUN VSN=v1.20.1 && \
     sed -i 's#ExecStart.*#\0 --no-upgrade#g' /home/aidanhs/local/etc/systemd/syncthing.service && \
     cp syncthing-linux-amd64-$VSN/syncthing /home/aidanhs/local/bin/
 
-# ?-?-? - ripgrep
-RUN VSN=12.0.1 && \
+# 2024-06-20 - zellij
+RUN VSN=0.40.1 && \
+    wget -q https://github.com/zellij-org/zellij/releases/download/v$VSN/zellij-x86_64-unknown-linux-musl.tar.gz && \
+    tar xf zellij-x86_64-unknown-linux-musl.tar.gz && \
+    cp zellij /home/aidanhs/local/bin/
+
+# 2024-06-20 - ripgrep
+RUN VSN=14.1.0 && \
     wget -q https://github.com/BurntSushi/ripgrep/releases/download/$VSN/ripgrep-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     tar xf ripgrep-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     cp ripgrep-$VSN-x86_64-unknown-linux-musl/rg /home/aidanhs/local/bin/
 
-# ?-?-? - exa
-RUN VSN=0.9.0 && \
-    wget -q https://github.com/ogham/exa/releases/download/v$VSN/exa-linux-x86_64-$VSN.zip && \
-    unzip exa-linux-x86_64-$VSN.zip && \
-    cp exa-linux-x86_64 /home/aidanhs/local/bin/exa
+# 2024-06-20 - exa
+RUN VSN=0.10.1 && \
+    wget -q https://github.com/ogham/exa/releases/download/v$VSN/exa-linux-x86_64-v$VSN.zip && \
+    unzip exa-linux-x86_64-v$VSN.zip && \
+    cp bin/exa /home/aidanhs/local/bin/exa
 
-# ?-?-? - fd
-RUN VSN=v7.5.0 && \
+# 2024-06-20 - fd
+RUN VSN=v10.1.0 && \
     wget -q https://github.com/sharkdp/fd/releases/download/$VSN/fd-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     tar xf fd-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     cp fd-$VSN-x86_64-unknown-linux-musl/fd /home/aidanhs/local/bin/
 
-# 2020-04-30 - bat
-RUN VSN=v0.15.0 && \
+# 2024-06-20 - bat
+RUN VSN=v0.24.0 && \
     wget -q https://github.com/sharkdp/bat/releases/download/$VSN/bat-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     tar xf bat-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     cp bat-$VSN-x86_64-unknown-linux-musl/bat /home/aidanhs/local/bin/
@@ -111,15 +87,14 @@ RUN VSN=v0.4.2 && \
     tar xf sccache-$VSN-x86_64-unknown-linux-musl.tar.gz && \
     cp sccache-$VSN-x86_64-unknown-linux-musl/sccache /home/aidanhs/local/bin/
 
-# 2022-06-03 - nvim
-RUN VSN=v0.7.0 && \
+# 2024-06-20 - nvim
+RUN VSN=v0.10.0 && \
     wget -q https://github.com/neovim/neovim/releases/download/$VSN/nvim-linux64.tar.gz && \
     tar xf nvim-linux64.tar.gz && \
     cp -r nvim-linux64/* /home/aidanhs/local/ && \
     cd /home/aidanhs/local/bin/ && ln -s nvim vim
 
-# 2022-06-03 - rust-analyzer
-RUN VSN=2022-05-30 && \
+RUN VSN=2024-06-17 && \
     wget -q https://github.com/rust-analyzer/rust-analyzer/releases/download/$VSN/rust-analyzer-x86_64-unknown-linux-musl.gz && \
     gunzip rust-analyzer-x86_64-unknown-linux-musl.gz && \
     mv rust-analyzer-x86_64-unknown-linux-musl /home/aidanhs/local/bin/rust-analyzer && \
@@ -137,17 +112,17 @@ RUN VSN=2.2.6 && \
     mv Zettlr-$VSN-x86_64.AppImage /home/aidanhs/local/bin/zettlr && \
     chmod +x /home/aidanhs/local/bin/zettlr
 
-# 2023-04-28 - zellij
-RUN VSN=0.36.0 && \
-    wget -q https://github.com/zellij-org/zellij/releases/download/v$VSN/zellij-x86_64-unknown-linux-musl.tar.gz && \
-    tar xf zellij-x86_64-unknown-linux-musl.tar.gz && \
-    cp zellij /home/aidanhs/local/bin/
-
 # 2023-04-28 - helix
 RUN VSN=23.03 && \
     wget -q https://github.com/helix-editor/helix/releases/download/$VSN/helix-$VSN-x86_64-linux.tar.xz && \
     tar xf helix-$VSN-x86_64-linux.tar.xz && \
-    cp -r helix-23.03-x86_64-linux/* /home/aidanhs/local/bin/
+    cp -r helix-$VSN-x86_64-linux/* /home/aidanhs/local/bin/
+
+# 2023-12-30 - nushell
+RUN VSN=0.88.1 && \
+    wget -q https://github.com/nushell/nushell/releases/download/$VSN/nu-$VSN-x86_64-linux-musl-full.tar.gz && \
+    tar xf nu-$VSN-x86_64-linux-musl-full.tar.gz && \
+    cp -r nu-$VSN-x86_64-linux-musl-full/* /home/aidanhs/local/bin/
 
 COPY fuse-overlayfs /home/aidanhs/local/bin/
 COPY scripts/boxtool /home/aidanhs/local/bin/
