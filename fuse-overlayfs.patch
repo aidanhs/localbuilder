@@ -1,0 +1,19 @@
+diff --git a/Containerfile.static.ubuntu b/Containerfile.static.ubuntu
+index b8568be..4fd3a83 100644
+--- a/Containerfile.static.ubuntu
++++ b/Containerfile.static.ubuntu
+@@ -1,11 +1,10 @@
+ FROM docker.io/ubuntu:rolling
+-WORKDIR /build
+ RUN apt-get update && \
+     apt-get install --no-install-recommends -y \
+         libc6-dev gcc g++ make automake autoconf clang pkgconf libfuse3-dev
+-
+-RUN cd fuse-overlayfs && \
+-    sh autogen.sh && \
++WORKDIR /build/fuse-overlayfs
++COPY . .
++RUN sh autogen.sh && \
+     LIBS="-ldl" LDFLAGS="-static" ./configure --prefix /usr && \
+     make
+ 

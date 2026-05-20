@@ -1,0 +1,52 @@
+diff --git a/excludedeblist b/excludedeblist
+index dd213ac..5074778 100644
+--- a/excludedeblist
++++ b/excludedeblist
+@@ -28,7 +28,6 @@ gstreamer1.0-pulseaudio
+ gtk2-engines-pixbuf
+ kde-runtime
+ libasound2
+-libatk1.0-0
+ libc6
+ libc6-dev
+ libcairo2
+@@ -43,7 +42,6 @@ libfontconfig1
+ libgbm1
+ libgcc1
+ # libgconf-2-4 # elementary OS 0.4 Loki does NOT have it
+-libgdk-pixbuf2.0-0
+ libgl1
+ libgl1-mesa
+ libgl1-mesa-dri
+@@ -54,13 +52,8 @@ libglu1-mesa
+ # libgpg-error0 gives non-fatal errors on many systems and is low-level, can it be expected to be everywhere?
+ libgpg-error0
+ # libgstreamer1.0-0
+-libgtk2.0-0
+ libgtk-3-0
+ libnss3
+-libpango1.0-0
+-libpango-1.0-0
+-libpangocairo-1.0-0 # Workaround for: openSUSE: undefined symbol: hb_buffer_set_cluster_level?; commenting this out leads to square boxes instead of fonts
+-libpangoft2-1.0-0 # Workaround for: openSUSE: undefined symbol: hb_buffer_set_cluster_level?; commenting this out leads to square boxes instead of fonts
+ libstdc++6
+ libtasn1-6
+ libwayland-egl1-mesa # e.g., OpenRA
+diff --git a/recipes/Meld.yml b/recipes/Meld.yml
+index 39a9235..0800cb5 100644
+--- a/recipes/Meld.yml
++++ b/recipes/Meld.yml
+@@ -5,6 +5,13 @@ ingredients:
+   dist: trusty
+   sources: 
+     - deb http://us.archive.ubuntu.com/ubuntu/ trusty main universe
++  packages:
++    - meld
++    - python-gtk2
+ 
+ script:
+   - cp ./usr/share/icons/hicolor/scalable/apps/meld.svg .
++  - sed -i '1s|.*|#!/usr/bin/env python|' ./usr/bin/meld
++  - sed -i 's|"\/usr\/lib\/meld"|os.path.join(melddir, "lib/meld")|' ./usr/bin/meld
++  - sed -i '/^_share_dir/{N;s/_share_dir = ( ".*"\n)/_share_dir = None\n/}' ./usr/lib/meld/meld/paths.py
++  - sed -i 's|if not _share_dir:  _share_dir  = appdir|if not _share_dir:  _share_dir  = os.path.join(appdir, "../../share/meld")|' ./usr/lib/meld/meld/paths.py
